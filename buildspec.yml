@@ -1,0 +1,24 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      docker: 18
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - $(aws ecr get-login --no-include-email --region us-east-1)
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...          
+      - docker build -t dvillane-gl-app .
+      - docker tag dvillane-gl-app:latest 371676301813.dkr.ecr.us-east-1.amazonaws.com/dvillane-gl-app:latest     
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker push 371676301813.dkr.ecr.us-east-1.amazonaws.com/dvillane-gl-app:latest
+      - printf '[{"name":"dvillane-gl-app","imageUri":"%s"}]' 371676301813.dkr.ecr.us-east-1.amazonaws.com/dvillane-gl-app:latest > imagedefinitions.json
+artifacts:
+    files: imagedefinitions.json
