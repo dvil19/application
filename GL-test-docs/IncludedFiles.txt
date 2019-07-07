@@ -1,0 +1,14 @@
+Created by Daniel Villanea
+villanea@gmail.com
+
+The following files are included:
+
+1- Diagram:
+    - DanielVillanea-GLTimeOutAppDiagram.pdf
+    - GL-diagram.drawio (code)
+2- CloudFormation code:
+    - VPC.Resources.yaml (Creates the VPC and subnets)
+    - SecurityGroups.Resources.yaml (Creates the security groups)
+    - ALB.Resources.yaml (Creates the app LB)
+    - TaskDefinition.Resources.yaml (Creates the task definition for the ECS service)
+    - ECS-cluster.Resources.yaml (Creates the app ECS cluster)
