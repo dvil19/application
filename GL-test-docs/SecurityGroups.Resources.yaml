@@ -1,0 +1,69 @@
+#create the Security Groups
+#dvillane
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  AWS CloudFormation template to create a new security groups
+  for an existing VPC
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: >
+      Specifies the ID of an existing VPC in which to create the security groups
+    Default: ''
+Resources:
+  ALBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: "Allow connection to the ALB"
+      GroupName: "allow_web_to_alb"
+      SecurityGroupEgress: 
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      SecurityGroupIngress: 
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIpv6: ::/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIpv6: ::/0         
+      VpcId: !Ref VpcId
+  EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: "Allow connection from the ALB to the EC2 instances"
+      GroupName: "allow_alb_to_ec2"
+      SecurityGroupEgress: 
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      SecurityGroupIngress: 
+        - IpProtocol: tcp
+          SourceSecurityGroupId: !GetAtt ALBSecurityGroup.GroupId
+          FromPort: 443
+          ToPort: 3000    
+      VpcId: !Ref VpcId
+Outputs:
+  StackName:
+    Description: 'Stack name.'
+    Value: !Sub '${AWS::StackName}'
+  SecurityGroupID1:
+    Description: 'ALB Security Group ID'
+    Value: !GetAtt ALBSecurityGroup.GroupId
+    Export:
+      Name: !Sub '${AWS::StackName}-AppLBSecurityGroupId'      
+  SecurityGroupID2:
+    Description: 'EC2 Security Group ID'
+    Value: !GetAtt EC2SecurityGroup.GroupId
+    Export:
+      Name: !Sub '${AWS::StackName}-EC2SecurityGroupId'
+

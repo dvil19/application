@@ -1,0 +1,47 @@
+#Deploys the task definition, with the docker image provided
+#dvillane
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'ECS Task definition'
+Metadata:
+  'AWS::CloudFormation::Interface':
+    ParameterGroups:
+    - Label:
+        default: 'Task Definition Parameters'
+      Parameters:
+      - TaskDP
+Parameters:
+  TaskDP:
+    Description: 'Address of the Docker image'
+    Type: String
+    Default: ''
+Resources:
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties: 
+      RequiresCompatibilities:
+        - "EC2"
+      ContainerDefinitions: 
+        - 
+          Name: "dvillane-gl-app"
+          Image: !Ref TaskDP
+          Cpu: "128"
+          Memory: "128"
+          PortMappings:
+            -
+              ContainerPort: "3000"
+              HostPort: "3000"
+          Essential: "true"
+      Cpu: '256'
+      Family: 'GLApp-dvillane-family'
+      Memory: '200'
+      NetworkMode: 'bridge'
+Outputs:
+  StackName:
+    Description: 'Stack name.'
+    Value: !Sub '${AWS::StackName}'     
+  Image:
+    Description: 'Task Definition Image repo'
+    Value: !Ref TaskDP
+    Export:
+      Name: !Sub '${AWS::StackName}-Repo'   
